@@ -1,0 +1,131 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Device Tree Include for Amlogic GXL DVB Support
+ * Compatible with: S905D, S905X, S905W (GXL family)
+ * 
+ * This file adds DVB hardware support for Mecool M8S Plus DVB-S2X
+ * and similar devices with built-in tuners
+ */
+
+/ {
+    /* DVB subsystem */
+    dvb@c8006000 {
+        compatible = "amlogic,dvb-gxl", "amlogic,dvb";
+        reg = <0x0 0xc8006000 0x0 0x1000>;  /* DVB register space */
+        interrupts = <GIC_SPI 23 IRQ_TYPE_EDGE_RISING>;
+        
+        clocks = <&clkc CLKID_DVB>;
+        clock-names = "dvb";
+        
+        resets = <&reset RESET_DVB>;
+        reset-names = "dvb";
+        
+        /* Transport Stream mode
+         * 0 = auto-detect
+         * 1 = serial (default for most GXL boxes)
+         * 2 = parallel
+         */
+        ts-mode = <1>;
+        
+        /* TS clock polarity */
+        ts-clk-pol = <0>;
+        
+        /* Enable hardware descrambler */
+        descrambler = <1>;
+        
+        status = "okay";
+    };
+    
+    /* I2C bus for frontend/tuner communication */
+    &i2c_AO {
+        status = "okay";
+        pinctrl-0 = <&i2c_ao_sck_pins>, <&i2c_ao_sda_pins>;
+        pinctrl-names = "default";
+        
+        /* M88RS6060 DVB-S/S2/S2X frontend
+         * Used in Mecool M8S Plus DVB-S2X
+         */
+        m88rs6060: m88rs6060@69 {
+            compatible = "montage,m88rs6060";
+            reg = <0x69>;
+            
+            /* Tuner is integrated in M88RS6060 */
+            tuner-integrated = <1>;
+            
+            /* Optional GPIO for reset/power */
+            reset-gpios = <&gpio GPIODV_23 GPIO_ACTIVE_LOW>;
+            power-gpios = <&gpio GPIODV_24 GPIO_ACTIVE_HIGH>;
+            
+            /* LNB control (for satellite) */
+            lnb-supply = <&lnb_regulator>;
+            
+            status = "okay";
+        };
+        
+        /* AVL6211 DVB-S/S2 frontend (alternative)
+         * Used in some WeTek and other boxes
+         */
+        avl6211: avl6211@60 {
+            compatible = "availink,avl6211";
+            reg = <0x60>;
+            
+            /* AV201x tuner */
+            tuner-i2c-addr = <0x62>;
+            
+            reset-gpios = <&gpio GPIODV_23 GPIO_ACTIVE_LOW>;
+            
+            status = "disabled";  /* Enable for AVL6211-based devices */
+        };
+    };
+    
+    /* Pinctrl for TS interface */
+    &periphs_pinctrl {
+        /* Serial TS pins */
+        dvb_s_ts0_pins: dvb-s-ts0 {
+            mux {
+                groups = "dvb_s_ts0_clk",
+                         "dvb_s_ts0_sync",
+                         "dvb_s_ts0_valid",
+                         "dvb_s_ts0_data";
+                function = "dvb_s_ts0";
+                bias-disable;
+            };
+        };
+        
+        /* Parallel TS pins (for boxes using parallel mode) */
+        dvb_p_ts0_pins: dvb-p-ts0 {
+            mux {
+                groups = "dvb_p_ts0_clk",
+                         "dvb_p_ts0_sync",
+                         "dvb_p_ts0_valid",
+                         "dvb_p_ts0_data0",
+                         "dvb_p_ts0_data1",
+                         "dvb_p_ts0_data2",
+                         "dvb_p_ts0_data3",
+                         "dvb_p_ts0_data4",
+                         "dvb_p_ts0_data5",
+                         "dvb_p_ts0_data6",
+                         "dvb_p_ts0_data7";
+                function = "dvb_p_ts0";
+                bias-disable;
+            };
+        };
+    };
+    
+    /* LNB power regulator (for satellite boxes) */
+    lnb_regulator: lnb-regulator {
+        compatible = "regulator-fixed";
+        regulator-name = "lnb-power";
+        regulator-min-microvolt = <13000000>;  /* 13V */
+        regulator-max-microvolt = <18000000>;  /* 18V */
+        gpio = <&gpio GPIODV_25 GPIO_ACTIVE_HIGH>;
+        enable-active-high;
+        regulator-boot-on;
+    };
+};
+
+/* Apply to specific device (example: Mecool M8S Plus DVB-S2X) */
+&dvb {
+    pinctrl-0 = <&dvb_s_ts0_pins>;  /* Use serial TS pins */
+    pinctrl-names = "default";
+};
