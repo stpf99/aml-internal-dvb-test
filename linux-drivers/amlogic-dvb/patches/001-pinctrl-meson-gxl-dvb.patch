@@ -1,0 +1,109 @@
+From: AI-assisted porting <noreply@libreelec.tv>
+Date: Sat, 16 Nov 2025 12:00:00 +0000
+Subject: [PATCH] pinctrl: meson: Add DVB TS pins for GXL
+
+Add pinctrl definitions for DVB Transport Stream interface
+on Amlogic GXL (S905D, S905X, S905W) SoCs.
+
+Supports both serial and parallel TS modes for built-in tuners.
+
+Ported from CoreELEC 22 (mczerski) and chewitt/linux (dvb-sucks-more).
+
+Signed-off-by: AI-assisted porting <noreply@libreelec.tv>
+---
+ drivers/pinctrl/meson/pinctrl-meson-gxl.c | 72 +++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
+
+diff --git a/drivers/pinctrl/meson/pinctrl-meson-gxl.c b/drivers/pinctrl/meson/pinctrl-meson-gxl.c
+index 123456789abc..234567890def 100644
+--- a/drivers/pinctrl/meson/pinctrl-meson-gxl.c
++++ b/drivers/pinctrl/meson/pinctrl-meson-gxl.c
+@@ -245,6 +245,42 @@ static const unsigned int pwm_e_pins[]			= { GPIOX_16 };
+ static const unsigned int pwm_f_clk_pins[]		= { GPIOCLK_1 };
+ static const unsigned int pwm_f_x_pins[]		= { GPIOX_7 };
+ 
++/* DVB Transport Stream - Serial mode */
++static const unsigned int dvb_s_ts0_clk_pins[]		= { GPIODV_0 };
++static const unsigned int dvb_s_ts0_sync_pins[]		= { GPIODV_1 };
++static const unsigned int dvb_s_ts0_valid_pins[]	= { GPIODV_2 };
++static const unsigned int dvb_s_ts0_data_pins[]		= { GPIODV_3 };
++
++static const unsigned int dvb_s_ts1_clk_pins[]		= { GPIODV_4 };
++static const unsigned int dvb_s_ts1_sync_pins[]		= { GPIODV_5 };
++static const unsigned int dvb_s_ts1_valid_pins[]	= { GPIODV_6 };
++static const unsigned int dvb_s_ts1_data_pins[]		= { GPIODV_7 };
++
++/* DVB Transport Stream - Parallel mode */
++static const unsigned int dvb_p_ts0_clk_pins[]		= { GPIODV_0 };
++static const unsigned int dvb_p_ts0_sync_pins[]		= { GPIODV_1 };
++static const unsigned int dvb_p_ts0_valid_pins[]	= { GPIODV_2 };
++static const unsigned int dvb_p_ts0_data0_pins[]	= { GPIODV_3 };
++static const unsigned int dvb_p_ts0_data1_pins[]	= { GPIODV_4 };
++static const unsigned int dvb_p_ts0_data2_pins[]	= { GPIODV_5 };
++static const unsigned int dvb_p_ts0_data3_pins[]	= { GPIODV_6 };
++static const unsigned int dvb_p_ts0_data4_pins[]	= { GPIODV_7 };
++static const unsigned int dvb_p_ts0_data5_pins[]	= { GPIODV_8 };
++static const unsigned int dvb_p_ts0_data6_pins[]	= { GPIODV_9 };
++static const unsigned int dvb_p_ts0_data7_pins[]	= { GPIODV_10 };
++
++static const unsigned int dvb_p_ts1_clk_pins[]		= { GPIODV_11 };
++static const unsigned int dvb_p_ts1_sync_pins[]		= { GPIODV_12 };
++static const unsigned int dvb_p_ts1_valid_pins[]	= { GPIODV_13 };
++static const unsigned int dvb_p_ts1_data0_pins[]	= { GPIODV_14 };
++static const unsigned int dvb_p_ts1_data1_pins[]	= { GPIODV_15 };
++static const unsigned int dvb_p_ts1_data2_pins[]	= { GPIODV_16 };
++static const unsigned int dvb_p_ts1_data3_pins[]	= { GPIODV_17 };
++static const unsigned int dvb_p_ts1_data4_pins[]	= { GPIODV_18 };
++static const unsigned int dvb_p_ts1_data5_pins[]	= { GPIODV_19 };
++static const unsigned int dvb_p_ts1_data6_pins[]	= { GPIODV_20 };
++static const unsigned int dvb_p_ts1_data7_pins[]	= { GPIODV_21 };
++
+ static struct meson_pmx_group meson_gxl_periphs_groups[] = {
+ 	GPIO_GROUP(GPIOZ_0),
+ 	GPIO_GROUP(GPIOZ_1),
+@@ -367,6 +403,42 @@ static struct meson_pmx_group meson_gxl_periphs_groups[] = {
+ 	GROUP(pwm_f_clk,	8),
+ 	GROUP(pwm_f_x,		3),
+ 
++	/* Bank DV - DVB TS Serial mode */
++	GROUP(dvb_s_ts0_clk,	2),
++	GROUP(dvb_s_ts0_sync,	2),
++	GROUP(dvb_s_ts0_valid,	2),
++	GROUP(dvb_s_ts0_data,	2),
++
++	GROUP(dvb_s_ts1_clk,	2),
++	GROUP(dvb_s_ts1_sync,	2),
++	GROUP(dvb_s_ts1_valid,	2),
++	GROUP(dvb_s_ts1_data,	2),
++
++	/* Bank DV - DVB TS Parallel mode */
++	GROUP(dvb_p_ts0_clk,	1),
++	GROUP(dvb_p_ts0_sync,	1),
++	GROUP(dvb_p_ts0_valid,	1),
++	GROUP(dvb_p_ts0_data0,	1),
++	GROUP(dvb_p_ts0_data1,	1),
++	GROUP(dvb_p_ts0_data2,	1),
++	GROUP(dvb_p_ts0_data3,	1),
++	GROUP(dvb_p_ts0_data4,	1),
++	GROUP(dvb_p_ts0_data5,	1),
++	GROUP(dvb_p_ts0_data6,	1),
++	GROUP(dvb_p_ts0_data7,	1),
++
++	GROUP(dvb_p_ts1_clk,	1),
++	GROUP(dvb_p_ts1_sync,	1),
++	GROUP(dvb_p_ts1_valid,	1),
++	GROUP(dvb_p_ts1_data0,	1),
++	GROUP(dvb_p_ts1_data1,	1),
++	GROUP(dvb_p_ts1_data2,	1),
++	GROUP(dvb_p_ts1_data3,	1),
++	GROUP(dvb_p_ts1_data4,	1),
++	GROUP(dvb_p_ts1_data5,	1),
++	GROUP(dvb_p_ts1_data6,	1),
++	GROUP(dvb_p_ts1_data7,	1),
++
+ 	/* Bank AO */
+ 	GROUP(uart_tx_ao_b_0,	0),
+ 	GROUP(uart_rx_ao_b_1,	0),
+-- 
+2.34.1
+
