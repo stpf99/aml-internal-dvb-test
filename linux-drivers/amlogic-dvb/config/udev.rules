@@ -1,0 +1,33 @@
+# Amlogic DVB - udev rules
+# File: amlogic-dvb/config/udev.rules
+# Location: /usr/lib/udev/rules.d/99-amlogic-dvb.rules
+
+# DVB devices permissions
+SUBSYSTEM=="dvb", GROUP="video", MODE="0660"
+KERNEL=="dvb*", GROUP="video", MODE="0660"
+
+# DVB adapter devices
+SUBSYSTEM=="dvb", KERNEL=="adapter*", GROUP="video", MODE="0660"
+
+# Frontend devices
+SUBSYSTEM=="dvb", KERNEL=="frontend*", GROUP="video", MODE="0660"
+SUBSYSTEM=="dvb", KERNEL=="frontend*", SYMLINK+="dvb/adapter%n/frontend%k"
+
+# Demux devices
+SUBSYSTEM=="dvb", KERNEL=="demux*", GROUP="video", MODE="0660"
+SUBSYSTEM=="dvb", KERNEL=="demux*", SYMLINK+="dvb/adapter%n/demux%k"
+
+# DVR devices (recording)
+SUBSYSTEM=="dvb", KERNEL=="dvr*", GROUP="video", MODE="0660"
+SUBSYSTEM=="dvb", KERNEL=="dvr*", SYMLINK+="dvb/adapter%n/dvr%k"
+
+# Network devices
+SUBSYSTEM=="dvb", KERNEL=="net*", GROUP="video", MODE="0660"
+SUBSYSTEM=="dvb", KERNEL=="net*", SYMLINK+="dvb/adapter%n/net%k"
+
+# CA devices (Conditional Access / CAM)
+SUBSYSTEM=="dvb", KERNEL=="ca*", GROUP="video", MODE="0660"
+SUBSYSTEM=="dvb", KERNEL=="ca*", SYMLINK+="dvb/adapter%n/ca%k"
+
+# Tag for systemd
+TAG+="systemd", ENV{SYSTEMD_WANTS}="amlogic-dvb-init.service"
